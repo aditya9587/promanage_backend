@@ -1,4 +1,5 @@
 import { userData } from "../model/userSchema.js";
+import { todoData } from "../model/Taskschema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
@@ -40,5 +41,20 @@ export const loginUser = async (req,res)=>{
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
   }
+}
+
+export const todoCreate = async(req,res) =>{
+  try {
+    const{title, priority , checklist , dueDate} = req.body;
+    
+    const data = new todoData({title,priority,checklist,dueDate})
+    console.log(data)
+    await data.save();
+    return res.status(200).json({message : "todo created Sucessfully",datamsg : data})
  
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: "Server error" });
+  }
+
 }
