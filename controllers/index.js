@@ -46,8 +46,8 @@ export const loginUser = async (req,res)=>{
 export const todoCreate = async(req,res) =>{
   try {
     const{title, priority , checklist , dueDate} = req.body;
-    
-    const data = new todoData({title,priority,checklist,dueDate})
+    const { user } = req;
+    const data = new todoData({title,priority,checklist,dueDate, taskID : user })
     console.log(data)
     await data.save();
     return res.status(200).json({message : "todo created Sucessfully",datamsg : data})
@@ -57,4 +57,39 @@ export const todoCreate = async(req,res) =>{
     return res.status(500).json({ message: "Server error" });
   }
 
+}
+
+export const getTodos =  async (req,res) =>{
+  try {
+    const data  = await todoData.find({ taskID: req.user });
+    return res.status(200).json({ data})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const updateTodo = async (req, res) =>{
+  const { id } = req.params;
+  const {status} = req.body
+  console.log(id)
+  console.log(status)
+  if (!id || !status) {
+    return res.status(400).json({ message: "Invalid request. Task ID and status are required." });
+  }
+  try {
+    const updatedTask = await todoData.findByIdAndUpdate(id, {status },{new:true})
+    res.status(200).json({ data: updatedTask });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating task status', error });
+  }
+}
+
+export const deleteTask = async (req,res) =>{
+  const { id } = req.params;
+  try {
+    const deleteTask = await todoData.findByIdAndDelete(id);
+    res.status(200).json({deleteTask})
+  } catch (error) {
+    res.status(500).json({message: "Error deleting task Status"})
+  }
 }

@@ -21,9 +21,7 @@ app.get("/",(req,res)=>{
   res.send("Everthing is fine");
 })
 
-// app.use("/",testRouter)
 app.use("/api/v1", userRouter)
-
 
 app.listen(process.env.PORT, ()=>{
   console.log("server is runnig")

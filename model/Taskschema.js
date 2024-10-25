@@ -13,14 +13,21 @@ const todoSchema = new mongoose.Schema({
   checklist: [
     {
       text: String,
-      completed: {
+      checked: {
         type: Boolean,
         default: false,
       },
     },
   ],
-  taskID: {
+  status: {
     type: String,
+    enum: ["backlog", "todo", "inProgress", "done"],
+    default: "todo",
+  },
+  taskID: {
+    type: mongoose.Schema.ObjectId,
+    ref: "userData",
+    require: true,
   },
   dueDate: {
     type: Date,
