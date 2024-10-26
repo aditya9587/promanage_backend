@@ -71,8 +71,6 @@ export const getTodos =  async (req,res) =>{
 export const updateTodo = async (req, res) =>{
   const { id } = req.params;
   const {status} = req.body
-  console.log(id)
-  console.log(status)
   if (!id || !status) {
     return res.status(400).json({ message: "Invalid request. Task ID and status are required." });
   }
@@ -92,4 +90,11 @@ export const deleteTask = async (req,res) =>{
   } catch (error) {
     res.status(500).json({message: "Error deleting task Status"})
   }
+}
+
+export const updateEmail = async (req, res) =>{
+  const { email } = req.params;
+  const update = await userData.find(email)
+  
+
 }
