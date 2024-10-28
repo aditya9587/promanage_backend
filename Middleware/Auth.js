@@ -10,7 +10,8 @@ export const AuthMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRETKEY);
     console.log(decoded)
-    req.user = decoded.key;
+    req.user = decoded.userId;
+    req.email = decoded.email;
     next();
   } catch (error) {
     res.status(401).json({ message: "User is not logged in" });

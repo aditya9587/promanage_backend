@@ -27,15 +27,19 @@ export const createUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const userCheck = await userData.findOne({ email });
-    if (!userCheck) {
+    const userDetails = await userData.findOne({ email });
+    if (!userDetails) {
       return res.status(400).json({ message: "user not exist" });
     }
-    const verifyPassword = await bcrypt.compare(password, userCheck.password);
+    const verifyPassword = await bcrypt.compare(password, userDetails.password);
     if (!verifyPassword) {
       return res.status(400).json({ message: " invalid credtinals " });
     }
-    const payload = { key: userCheck._id };
+    const payload = {
+      userId: userDetails._id,
+      name: userDetails.name,
+      email: userDetails.email,
+    };
     const token = jwt.sign(payload, process.env.SECRETKEY);
     return res
       .status(200)
@@ -110,15 +114,44 @@ export const deleteTask = async (req, res) => {
 
 export const editTask = async (req, res) => {
   const { id } = req.params;
+  const updatedtask = req.body;
   try {
-    const editTask = await todoData.findByIdAndUpdate(id);
+    const editTask = await todoData.findByIdAndUpdate(id, updatedtask, {
+      new: true,
+    });
+    if (!editTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
     return res.status(200).json({ message: "TO do updated Successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Error deleting task Status" });
   }
 };
 
-export const updateEmail = async (req, res) => {
-  const { email } = req.params;
-  const update = await userData.find(email);
+export const updateUser = async (req, res) => {
+  const { name, email, oldpassword, newpassword } = req.body;
+  try {
+    const updateUser = await userData.findById(req.user);
+    if (!updateUser) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+
+    const passwordVerify = await bcrypt.compare(
+      oldpassword,
+      updateUser.password
+    );
+    if (!passwordVerify) {
+      return res.status(400).json({ message: "invalid password" });
+    }
+    const updatePassword = await bcrypt.hash(newpassword, 10);
+
+    updateUser.password = updatePassword;
+    updateUser.name = name;
+    updateUser.email = email;
+
+    await updateUser.save();
+    return res.status(200).json({ message: " Email updated sucessfully" });
+  } catch (error) {
+    return res.status(500).json({ message: " error updating in email " });
+  }
 };
