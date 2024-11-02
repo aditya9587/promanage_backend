@@ -41,9 +41,7 @@ export const loginUser = async (req, res) => {
       email: userDetails.email,
     };
     const token = jwt.sign(payload, process.env.SECRETKEY);
-    return res
-      .status(200)
-      .json({ message: "user login successfull", Token: token });
+    return res.status(200).json({ message: "user login successfull", Token: token });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
   }
@@ -55,7 +53,6 @@ export const todoCreate = async (req, res) => {
     const { user } = req;
     let assignedUserId = null;
 
-    // Check if `assignTo` contains an email and find the corresponding user
     if (assignTo) {
       const assignedUser = await userData.findOne({ email: assignTo });
       if (assignedUser) {
@@ -70,15 +67,11 @@ export const todoCreate = async (req, res) => {
       checklist,
       dueDate,
       taskID: user,
-      assignTo :assignedUserId,
+      assignTo: assignedUserId,
     });
-    console.log(data);
     await data.save();
-    return res
-      .status(200)
-      .json({ message: "todo created Sucessfully", datamsg: data });
+    return res.status(200).json({ message: "todo created Sucessfully", datamsg: data });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -90,7 +83,7 @@ export const getTodos = async (req, res) => {
     });
     return res.status(200).json({ data });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -177,4 +170,17 @@ export const getallUsers = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: "error getting all users" });
   }
-} 
+};
+
+export const getUserById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await userData.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user });
+  } catch (error) {
+    return res.status(500).json({ message: "Error getting user by ID" });
+  }
+};
