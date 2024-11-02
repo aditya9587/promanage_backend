@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, loginUser,todoCreate , getTodos, updateTodo, deleteTask, editTask, updateUser} from '../controllers/index.js';
+import { createUser, loginUser,todoCreate , getTodos, updateTodo, deleteTask, editTask, updateUser, getallUsers} from '../controllers/index.js';
 import { AuthMiddleware } from '../Middleware/Auth.js';
 
 export const userRouter = express.Router();
@@ -21,3 +21,5 @@ userRouter.patch("/editTask/:id",AuthMiddleware,editTask)
 //settings tab route
 
 userRouter.put("/updateUser",AuthMiddleware, updateUser)
+
+userRouter.get("/getallUser",AuthMiddleware, getallUsers)

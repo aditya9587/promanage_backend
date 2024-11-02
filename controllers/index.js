@@ -51,14 +51,26 @@ export const loginUser = async (req, res) => {
 
 export const todoCreate = async (req, res) => {
   try {
-    const { title, priority, checklist, dueDate } = req.body;
+    const { title, priority, checklist, dueDate, assignTo } = req.body;
     const { user } = req;
+    let assignedUserId = null;
+
+    // Check if `assignTo` contains an email and find the corresponding user
+    if (assignTo) {
+      const assignedUser = await userData.findOne({ email: assignTo });
+      if (assignedUser) {
+        assignedUserId = assignedUser._id;
+      } else {
+        return res.status(404).json({ message: "Assigned user not found in the database" });
+      }
+    }
     const data = new todoData({
       title,
       priority,
       checklist,
       dueDate,
       taskID: user,
+      assignTo :assignedUserId,
     });
     console.log(data);
     await data.save();
@@ -73,7 +85,9 @@ export const todoCreate = async (req, res) => {
 
 export const getTodos = async (req, res) => {
   try {
-    const data = await todoData.find({ taskID: req.user });
+    const data = await todoData.find({
+      $or: [{ taskID: req.user }, { assignTo: req.user }],
+    });
     return res.status(200).json({ data });
   } catch (error) {
     console.log(error);
@@ -155,3 +169,12 @@ export const updateUser = async (req, res) => {
     return res.status(500).json({ message: " error updating in email " });
   }
 };
+
+export const getallUsers = async (req, res) => {
+  try {
+    const users = await userData.find();
+    return res.status(200).json({ users });
+  } catch (error) {
+    return res.status(500).json({ message: "error getting all users" });
+  }
+} 

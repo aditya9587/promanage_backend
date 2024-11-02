@@ -29,6 +29,10 @@ const todoSchema = new mongoose.Schema({
     ref: "userData",
     require: true,
   },
+  assignTo: {
+    type: mongoose.Schema.ObjectId,
+    ref: "userData",
+  },
   dueDate: {
     type: Date,
   },
